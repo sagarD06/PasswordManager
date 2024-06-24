@@ -1,0 +1,17 @@
+[
+    {
+      "title": "Message from User123",
+      "content": "Awesome way to store passwords",
+      "received": "10 minutes ago"
+    },
+    {
+      "title": "Message from SecretAdmirer",
+      "content": "I really liked this web app!",
+      "received": "2 hours ago"
+    },
+    {
+      "title": "Message from Rocky",
+      "content": "One point STORE for our passwords",
+      "received": "1 day ago"
+    }
+  ]
