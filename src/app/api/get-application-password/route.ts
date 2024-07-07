@@ -5,7 +5,6 @@ import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/models/User.model";
 import { User } from "next-auth";
 
-
 /*****************************GET APPS PASSWORDS ROUTE********************************************/
 
 export async function GET(request: Request) {
@@ -27,13 +26,8 @@ export async function GET(request: Request) {
     const user = await UserModel.aggregate([
       { $match: { _id: userId } },
       { $unwind: "$passwords" },
-      { $sort: { "$passwords.createdAt": -1 } },
-      {
-        $group: {
-          _id: "$_id",
-          passwords: { $push: ["$applicationName", "$password"] },
-        },
-      },
+      { $sort: { "passwords.createdAt": -1 } },
+      { $group: { _id: "$_id", passwords: { $push: "$passwords" } } },
     ]).exec();
 
     if (!user || user.length === 0) {
@@ -43,10 +37,7 @@ export async function GET(request: Request) {
       );
     }
 
-    return Response.json(
-      { success: true, data: user[0].passwords },
-      { status: 200 }
-    );
+    return Response.json({ success: true, data: user[0].passwords }, { status: 200 });
   } catch (error) {
     return Response.json(
       { success: false, message: "Failed to fetch messages!" },

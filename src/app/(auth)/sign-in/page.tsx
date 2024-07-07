@@ -20,6 +20,8 @@ import { Button } from "@/components/ui/button";
 // import { BackgroundBeams } from "@/components/ui/background-beams";
 import { signInSchema } from "@/schemas/signInSchema";
 import Link from "next/link";
+import { BackgroundBeams } from "@/components/ui/background-beams";
+import { BackgroundGradient } from "@/components/ui/background-gradient";
 
 const signInPage = () => {
   const [isSigningIn, setIsSigningIn] = useState(false);
@@ -53,7 +55,7 @@ const signInPage = () => {
         }
       }
       if (result?.url) {
-        router.replace("/dashboard"); 
+        router.replace("/dashboard");
       }
     } catch (error: any) {
       toast({
@@ -67,68 +69,74 @@ const signInPage = () => {
   };
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-800">
-      {/* <BackgroundBeams className="bg-gray-900" /> */}
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md z-20">
-        <div className="text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl mb-6">
-            Hello There..👋
-          </h1>
-          <p className="mb-4">Sign in to continue saving your passwords</p>
+      <BackgroundBeams className="bg-gray-900" />
+      <BackgroundGradient>
+        <div className="w-full max-w-md p-8 space-y-8 bg-transparent rounded-lg shadow-lg z-20">
+          <div className="text-center">
+            <h1 className="text-3xl text-white font-extrabold tracking-tight lg:text-4xl mb-6">
+              Hello There..👋
+            </h1>
+            <p className="mb-4">Sign in to continue saving your passwords</p>
+          </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                name="identifier"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email/Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Email or Username" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Enter your password"
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                className="w-full bg-orange-400 hover:bg-orange-600"
+                disabled={isSigningIn}
+              >
+                {isSigningIn ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Logging
+                    in..
+                  </>
+                ) : (
+                  "Login"
+                )}
+              </Button>
+            </form>
+          </Form>
+          <div className="text-center mt-4">
+            <p>
+              Not a member yet?{" "}
+              <Link
+                href="/sign-up"
+                className="text-stone-300 hover:text-stone-200"
+              >
+                Sign up
+              </Link>
+            </p>
+          </div>
         </div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              name="identifier"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email/Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Email or Username" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Enter your password"
-                      {...field}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <Button
-              type="submit"
-              className="w-full bg-orange-400 hover:bg-orange-600"
-              disabled={isSigningIn}
-            >
-              {isSigningIn ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Logging in..
-                </>
-              ) : (
-                "Login"
-              )}
-            </Button>
-          </form>
-        </Form>
-        <div className="text-center mt-4">
-          <p>
-            Not a member yet?{" "}
-            <Link href="/sign-up" className="text-blue-600 hover:text-blue-800">
-              Sign up
-            </Link>
-          </p>
-        </div>
-      </div>
+      </BackgroundGradient>
     </div>
   );
 };
