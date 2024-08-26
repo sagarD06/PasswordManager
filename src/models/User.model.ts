@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface Password extends Document {
   applicationName: string;
-  applicationPassword: string;
+  password: string;
   createdAt?: Date;
 }
 
@@ -11,7 +11,7 @@ const PasswordSchema: Schema<Password> = new Schema({
     type: String,
     required: true,
   },
-  applicationPassword: {
+  password: {
     type: String,
     required: true,
   },

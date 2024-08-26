@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const hashedMpin = await bcrypt.hash(mpin, 20);
+    const hashedMpin = await bcrypt.hash(mpin, 10);
     let mPinValidity = new Date();
     mPinValidity.setMonth(mPinValidity.getMonth() + 1);
 

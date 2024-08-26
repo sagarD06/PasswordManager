@@ -3,6 +3,7 @@ import UserModel, { Password } from "@/models/User.model";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { User, getServerSession } from "next-auth";
 import bcrypt from "bcrypt";
+import { string } from "zod";
 
 /*****************************CREATE APPS PASSWORD ROUTE********************************************/
 
@@ -34,14 +35,15 @@ export async function POST(request: Request) {
         { status: 404 }
       );
     }
-    const hashedPassword = await bcrypt.hash(applicationPassword, 10);
+
     const newPassword = {
       applicationName,
-      password: hashedPassword,
+      password : applicationPassword,
       createdAt: new Date(),
     };
 
     currentUser.passwords.push(newPassword as Password);
+
     await currentUser.save();
 
     return Response.json(

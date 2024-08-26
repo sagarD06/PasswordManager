@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Password } from "@/models/User.model";
 import { useForm } from "react-hook-form";
@@ -25,13 +25,12 @@ import Navbar from "@/components/Navbar";
 import { columns } from "@/components/DisplayPasswords/columns";
 import DisplayTable from "@/components/DisplayPasswords/DisplayTable";
 import Footer from "@/components/Footer";
+import { PasswordContext } from "@/store/passwordContext";
 
 const Dashboard = () => {
-  const [passwords, setPasswords] = useState<Password[]>([]);
+  const { passwords, storePasswords } = useContext(PasswordContext);
   const [isAddingPassword, setIsAddingPassword] = useState(false);
   const [isEditable, setIsEditable] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
   const { toast } = useToast();
   const params = useParams();
   const form = useForm<z.infer<typeof passwordStorageSchema>>({
@@ -39,27 +38,8 @@ const Dashboard = () => {
   });
   const { data: session } = useSession();
 
-  async function getPasswords() {
-    try {
-      setIsLoading(true);
-      const response = await axios.get("/api/get-application-password");
-      if (passwords.length < response.data.data.length) {
-        setPasswords(response.data.data);
-      }
-    } catch (error) {
-      const axiosError = error as AxiosError<ApiResponse>;
-      console.log(axiosError.response?.data);
-    }finally{
-      setIsLoading(false);
-    }
-  }
-  // console.log(passwords);
-  useEffect(() => {
-    if (!session) return;
-    getPasswords();
-  }, [passwords, getPasswords]);
-
   async function onSubmit(data: z.infer<typeof passwordStorageSchema>) {
+    console.log(data);
     try {
       if (!isEditable) {
         setIsAddingPassword(true);
@@ -67,6 +47,7 @@ const Dashboard = () => {
           applicationName: data.applicationName,
           applicationPassword: data.applicationPassword,
         });
+
         if (!response.data.success) {
           toast({
             title: "Error",
@@ -76,7 +57,7 @@ const Dashboard = () => {
         }
       } else {
         setIsEditable(true);
-        await axios.patch(`/api/edit-application-password/${params._id}`, {
+        await axios.patch(`/api/update-application-password/${params._id}`, {
           applicationName: data.applicationName,
           applicationPassword: data.applicationPassword,
         });
@@ -104,13 +85,11 @@ const Dashboard = () => {
         variant: "destructive",
       });
     } finally {
+      storePasswords();
       setIsAddingPassword(false);
     }
   }
-  async function handleEditPassword(password: Password) {}
-  async function handleDeletePassword(password: Password) {}
-  async function handleToggleVisibility() {}
-  // console.log(passwords)
+
   return (
     <div className="flex flex-col relative justify-center items-center min-h-screen dark:bg-black bg-white  dark:bg-grid-white/[0.2] bg-grid-black/[0.2]">
       <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-black bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
@@ -164,7 +143,7 @@ const Dashboard = () => {
         </Form>
       </section>
       <section className="w-full md:w-[70%] bg-white dark:bg-gray-800  px-4 md:px-6 py-5 rounded-lg mt-10 shadow-lg">
-        <DisplayTable columns={columns} data={passwords}/>
+        <DisplayTable columns={columns} data={passwords} />
       </section>
 
       <Footer />

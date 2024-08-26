@@ -2,9 +2,10 @@ import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/models/User.model";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { User, getServerSession } from "next-auth";
+import bcrypt from "bcrypt";
 
 /*****************************VERIFY MPIN ROUTE********************************************/
-export default async function POST(request: Request) {
+export async function POST(request: Request) {
   try {
     await dbConnect();
     const { mpin } = await request.json();
@@ -20,7 +21,7 @@ export default async function POST(request: Request) {
 
     const currentUser = await UserModel.findById({ _id: user._id });
 
-    if(!currentUser){
+    if (!currentUser) {
       return Response.json(
         {
           success: false,
@@ -29,18 +30,22 @@ export default async function POST(request: Request) {
         { status: 404 }
       );
     }
-
-    if (mpin !== currentUser?.mPin) {
+    const isMpinCorrect = await bcrypt.compare(
+      mpin as string,
+      currentUser?.mPin
+    );
+    if (!isMpinCorrect) {
       let attempts = currentUser?.mPinAttempts;
-      if( attempts > 0){
+      if (attempts > 0) {
         attempts -= 1;
         currentUser.mPinAttempts = attempts;
         await currentUser.save();
-      }else{
+      } else {
         return Response.json(
           {
             success: false,
-            message: "You have exceeded the maximum number of attempts. Please create a new M-Pin",
+            message:
+              "You have exceeded the maximum number of attempts. Please create a new M-Pin",
           },
           { status: 419 }
         );
